@@ -1,5 +1,6 @@
 from flask import Flask, request
 from item import make_item
+from item_repository import MemoryItemsRepository, SQLiteItemsRepository
 from tax_report import tax_report
 from vat_calculator import VatCalculator
 from vat_item_factory import VATItemFactory
@@ -7,7 +8,7 @@ from whitelist import read_whitelist
 
 app = Flask(__name__)
 
-item_list = []
+item_repository = SQLiteItemsRepository()
 whitelist = read_whitelist()
 vat_table = [ { "percentage": 7 } ]
 
@@ -19,18 +20,17 @@ def index():
 
 @app.route("/items/report")
 def get_vat_report():
-    print(whitelist)
-    return tax_report(item_list, VATItemFactory(whitelist, VatCalculator(vat_table[-1]["percentage"])))
+    return tax_report(item_repository.get_all(), VATItemFactory(whitelist, VatCalculator(vat_table[-1]["percentage"])))
 
 
 @app.route("/items", methods=["PUT", "DELETE"])
 def items():
-    global item_list
+    global item_repository
     if request.method == "PUT":
-        item_list.append(make_item(request.json))
+        item_repository.add_item(request.json)
         return "", 201
     
-    item_list = []
+    item_repository.delete_all()
     return "", 200
 
 

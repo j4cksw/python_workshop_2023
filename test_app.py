@@ -5,8 +5,8 @@ from app import app
 def setup(request):
     response = app.test_client().delete("/items")
     assert response.status_code == 200
-    # response = app.test_client().delete("/whitelist")
-    # assert response.status_code == 200
+    response = app.test_client().delete("/whitelist")
+    assert response.status_code == 200
 
 
 def test_index(setup):
@@ -49,8 +49,8 @@ def test_two_items_in_vat_report(setup):
 
 
 def test_vat_exempted_item_in_text_report(setup):
-    # response = app.test_client().put("/whitelist", json={ "type": "book" })
-    # assert response.status_code == 201
+    response = app.test_client().put("/whitelist", json={ "type": "book" })
+    assert response.status_code == 201
 
     response = app.test_client().put("/items", json={"title": "Python stressed", "type": ["book"], "price": 100 })
     assert response.status_code == 201
