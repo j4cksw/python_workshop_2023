@@ -3,11 +3,12 @@ from item import make_item
 from tax_report import tax_report
 from vat_calculator import VatCalculator
 from vat_item_factory import VATItemFactory
+from whitelist import read_whitelist
 
 app = Flask(__name__)
 
 item_list = []
-whitelist = { "book", "stationary", "otop" }
+whitelist = read_whitelist()
 vat_table = [ { "percentage": 7 } ]
 
 
@@ -18,6 +19,7 @@ def index():
 
 @app.route("/items/report")
 def get_vat_report():
+    print(whitelist)
     return tax_report(item_list, VATItemFactory(whitelist, VatCalculator(vat_table[-1]["percentage"])))
 
 
